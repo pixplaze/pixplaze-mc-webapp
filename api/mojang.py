@@ -5,13 +5,15 @@ import codecs
 from .endpoints import Mojang
 
 # For test only
+
 uuid = 'c01f3d0a58ca4aeaa1b95cf8f172b664'
+
 
 # Utils
 
-def warning(message='Функционал `{name}` пока не доступен!'):
+def warning(message='Функционал `{name}` пока не поддерживается!'):
     def outer(func):
-        def inner():
+        def inner(*args, **kwargs):
             raise DeprecationWarning(message.format(name=func.__name__))
         return inner
     return outer
