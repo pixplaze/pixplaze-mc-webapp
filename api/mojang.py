@@ -66,7 +66,13 @@ def username_to_uuid(username):
         return req.get(Mojang.API.USERNAME_TO_UUID.format(username=username)).json()
 
 
-def uuid_to_username(uuid):
+def uuid_to_username(uuid: str):
+    """
+    Функция-обёртка для Mojang API.
+    Запрашивает имя пользователя по `uuid`.
+    @param uuid: уникальный идентификатор пользователя;
+    @return: `dict` c id пользователя и его именем.
+    """
     if not validate_uuid(uuid):
         raise AttributeError(f'Invalid UUID: {uuid}!')
     return req.get(Mojang.API.UUID_TO_USERNAME.format(uuid=uuid)).json()
