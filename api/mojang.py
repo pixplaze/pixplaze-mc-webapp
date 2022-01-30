@@ -57,11 +57,11 @@ def username_to_uuid(username):
     if isinstance(username, list):
         for name in username:
             if not validate_username(name):
-                raise AttributeError(f'Invalid username: {name}!')
+                raise ValueError(f'Invalid username: {name}!')
         return req.post(Mojang.API.USERNAMES_TO_UUIDS, json=username).json()
     else:
         if not validate_username(username):
-            raise AttributeError(f'Invalid username: {username}!')
+            raise ValueError(f'Invalid username: {username}!')
         return req.get(Mojang.API.USERNAME_TO_UUID.format(username=username)).json()
 
 
@@ -73,11 +73,11 @@ def uuid_to_username(uuid: str):
     @return: `dict` c id пользователя и его именем.
     """
     if not validate_uuid(uuid):
-        raise AttributeError(f'Invalid UUID: {uuid}!')
+        raise ValueError(f'Invalid UUID: {uuid}!')
     return req.get(Mojang.API.UUID_TO_USERNAME.format(uuid=uuid)).json()
 
 
-def uuid_to_username_history(uuid):
+def uuid_to_username_history(uuid: str):
     """
     Функция-обёртка для Mojang API.
     @param uuid: уникальный идентификатор пользователя;
@@ -87,11 +87,11 @@ def uuid_to_username_history(uuid):
     return resp
 
 
-def get_player_profile(uuid):
+def uuid_to_user_profile(uuid: str):
     resp = req.get(Mojang.SESSION_SERVER.PLAYER_PROFILE.format(uuid=uuid)).json()
     if 'error' in resp:
-        raise AttributeError('Invalid player UUID!')
-    else:
+        raise ValueError('Invalid player UUID!')
+    else:  # TODO: Изменить извлечение `value` на проход по списку `properties`
         decoded = base64_to_json(resp['properties'][0]['value'])
         resp['properties'][0]['value'] = decoded
     return resp
@@ -188,7 +188,7 @@ def base64_to_json(data):
 
 ####################
 def get_player_textures(uuid):
-    profile = get_player_profile(uuid)
+    profile = uuid_to_user_profile(uuid)
     textures = None
     for prop in profile['properties']:
         if prop['name'] == 'textures': textures = prop['value']
