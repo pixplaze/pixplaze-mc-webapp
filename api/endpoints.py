@@ -3,8 +3,7 @@ __all__ = ['Mojang']
 
 class BaseURL:
     """
-    Класс описывающий конечную точку URL адреса.
-    То есть корневой URL, к которому могут быть добавлены подкаталоги.
+    Класс описывающий начальную точку URL адреса API.
     """
     def __init__(self, url):
         """
@@ -25,8 +24,10 @@ class Mojang:
     SESSION_SERVER  = BaseURL('https://sessionserver.mojang.com')
 
     API.SKIN                    = '/user/profile/{uuid}/skin'
-    API.USERNAME_HISTORY        = '/user/profiles/{uuid}/names'
+    API.UUID_TO_USERNAME        = '/user/profile/{uuid}'
     API.USERNAME_TO_UUID        = '/users/profiles/minecraft/{username}'
     API.USERNAMES_TO_UUIDS      = '/profiles/minecraft'
+    API.USERNAME_HISTORY        = '/user/profiles/{uuid}/names'
+
 
     SESSION_SERVER.PLAYER_PROFILE = '/session/minecraft/profile/{uuid}'

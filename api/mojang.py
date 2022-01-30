@@ -4,6 +4,10 @@ import requests as req
 import codecs
 from .endpoints import Mojang
 
+# For test only
+uuid = 'c01f3d0a58ca4aeaa1b95cf8f172b664'
+
+# Utils
 
 def warning(message='Функционал `{name}` пока не доступен!'):
     def outer(func):
@@ -37,7 +41,9 @@ def validate_username(username: str) -> bool:
     if username and 3 <= len(username) <= 17: return True
 
 
-def get_player_uuid(username):
+# Mojang API wrappers
+
+def username_to_uuid(username):
     """
     Функция-обёртка над Mojang API для
     запроса `UUID` игрока или игроков по имени (или именам пользователей).
@@ -48,10 +54,22 @@ def get_player_uuid(username):
         `dict`, если передано одно имя в виде `str`,
         или `list`, если было передано несколько имён в виде `list`.
     """
+
     if isinstance(username, list):
+        for name in username:
+            if not validate_username(name):
+                raise AttributeError(f'Invalid username: {name}!')
         return req.post(Mojang.API.USERNAMES_TO_UUIDS, json=username).json()
     else:
+        if not validate_username(username):
+            raise AttributeError(f'Invalid username: {username}!')
         return req.get(Mojang.API.USERNAME_TO_UUID.format(username=username)).json()
+
+
+def uuid_to_username(uuid):
+    if not validate_uuid(uuid):
+        raise AttributeError(f'Invalid UUID: {uuid}!')
+    return req.get(Mojang.API.UUID_TO_USERNAME.format(uuid=uuid)).json()
 
 
 def get_username_history(uuid):
