@@ -5,6 +5,14 @@ import codecs
 from .endpoints import Mojang
 
 
+def warning(message='Функционал `{name}` пока не доступен!'):
+    def outer(func):
+        def inner():
+            raise DeprecationWarning(message.format(name=func.__name__))
+        return inner
+    return outer
+
+
 def validate_uuid(uuid: str) -> bool:
     """
     Проверяет корректность `uuid`, (не пустая строка и не `None`,
@@ -61,67 +69,88 @@ def get_player_profile(uuid):
     return resp
 
 
+@warning()
 def blocked_servers(): pass  # TODO
 
 
+@warning()
 def statistics(): pass  # TODO
 
 
+@warning()
 def profile_information(): pass  # TODO
 
 
+@warning()
 def player_attributes(): pass  # TODO
 
 
+@warning()
 def profile_name_change_information(): pass  # TODO
 
 
+@warning()
 def check_product_voucher(): pass  # TODO
 
 
+@warning()
 def name_availability(username):
     return req.get(f'https://api.minecraftservices.com/minecraft/profile/name/{username}/available')
 
 
+@warning()
 def change_name(): pass  # TODO
 
 
+@warning()
 def change_skin(): pass  # TODO
 
 
+@warning()
 def upload_skin(): pass  # TODO
 
 
+@warning()
 def reset_skin(): pass  # TODO
 
 
+@warning()
 def hide_cape(): pass  # TODO
 
 
+@warning()
 def show_cape(): pass  # TODO
 
 
+@warning()
 def verify_security_location(): pass  # TODO
 
 
+@warning()
 def get_security_questions(): pass  # TODO
 
 
+@warning()
 def send_security_answers(): pass  # TODO
 
 
+@warning()
 def get_account_migration_information(): pass  # TODO
 
 
+@warning()
 def account_migration_otp(): pass  # TODO
 
 
+@warning()
 def verify_account_migration_otp(): pass  # TODO
 
 
+@warning()
 def submit_migration_token(): pass  # TODO
 
 
+@warning()
 def connect_xbox_live(): pass  # TODO
 
 
@@ -148,7 +177,7 @@ def get_player_skin_image(url):
     return req.get(url).content
 
 
-def __bytes_to_image__(image_bytes):
+def bytes_to_image(image_bytes):
     from io import BytesIO
     return Image.open(BytesIO(image_bytes))
 
