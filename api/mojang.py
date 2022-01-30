@@ -54,7 +54,6 @@ def username_to_uuid(username):
         `dict`, если передано одно имя в виде `str`,
         или `list`, если было передано несколько имён в виде `list`.
     """
-
     if isinstance(username, list):
         for name in username:
             if not validate_username(name):
@@ -78,7 +77,12 @@ def uuid_to_username(uuid: str):
     return req.get(Mojang.API.UUID_TO_USERNAME.format(uuid=uuid)).json()
 
 
-def get_username_history(uuid):
+def uuid_to_username_history(uuid):
+    """
+    Функция-обёртка для Mojang API.
+    @param uuid: уникальный идентификатор пользователя;
+    @return: `dict` cо списком истории его имён.
+    """
     resp = req.get(Mojang.API.USERNAME_HISTORY.format(uuid=uuid)).json()
     return resp
 
