@@ -90,6 +90,14 @@ def uuid_to_username_history(uuid: str):
 
 
 def uuid_to_user_profile(uuid: str):
+    """
+    Функция-обёртка для Mojang API.
+    Запрашивает профиль игрока по `uuid`. Автоматически декодирует
+    `property` `textures['value']` в json.
+    @param uuid: уникальный идентификатор пользователя;
+    @return: `dict` со структурой профиля игрока с декодированным
+    `property` `textures['value']`.
+    """
     if not validate_uuid(uuid):
         raise ValueError(f'Invalid player UUID: {uuid}!')
     resp = req.get(Mojang.SESSION_SERVER.PLAYER_PROFILE.format(uuid=uuid)).json()
