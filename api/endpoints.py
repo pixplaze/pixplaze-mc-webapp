@@ -25,9 +25,9 @@ class Mojang:
 
     API.SKIN                    = '/user/profile/{uuid}/skin'
     API.UUID_TO_USERNAME        = '/user/profile/{uuid}'
-    API.USERNAME_TO_UUID        = '/users/profiles/minecraft/{username}'
-    API.USERNAMES_TO_UUIDS      = '/profiles/minecraft'
     API.USERNAME_HISTORY        = '/user/profiles/{uuid}/names'
+    API.USERNAMES_TO_UUIDS      = '/profiles/minecraft'
+    API.USERNAME_TO_UUID        = '/users/profiles/minecraft/{username}'
 
-
+    SESSION_SERVER.BLOCKED_SERVERS = '/blockedservers'
     SESSION_SERVER.PLAYER_PROFILE = '/session/minecraft/profile/{uuid}'

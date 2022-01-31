@@ -1,7 +1,7 @@
-from uuid import UUID
 import json
-import requests as req
 import codecs
+from uuid import UUID
+import requests as req
 from .endpoints import Mojang
 
 # For test only
@@ -90,17 +90,24 @@ def uuid_to_username_history(uuid: str):
 
 
 def uuid_to_user_profile(uuid: str):
+    if not validate_uuid(uuid):
+        raise ValueError(f'Invalid player UUID: {uuid}!')
     resp = req.get(Mojang.SESSION_SERVER.PLAYER_PROFILE.format(uuid=uuid)).json()
     if 'error' in resp:
-        raise ValueError('Invalid player UUID!')
+        raise ValueError(f'Player not found: {uuid}!')
     else:  # TODO: Изменить извлечение `value` на проход по списку `properties`
         decoded = base64_to_json(resp['properties'][0]['value'])
         resp['properties'][0]['value'] = decoded
     return resp
 
 
-@warning()
-def blocked_servers(): pass  # TODO
+def blocked_servers():
+    """
+    Функция-обёртка для Mojang API.
+    Запрашивает заблокированные сервера.
+    @return: текст SHA1 ip адресов, разделённые переносом строки.
+    """
+    return req.get(Mojang.SESSION_SERVER.BLOCKED_SERVERS).text
 
 
 @warning()
