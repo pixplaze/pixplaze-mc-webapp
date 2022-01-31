@@ -82,6 +82,7 @@ def uuid_to_username(uuid: str):
 def uuid_to_username_history(uuid: str):
     """
     Функция-обёртка для Mojang API.
+    Запрашивает историю изменений имени профиля Minecraft.
     @param uuid: уникальный идентификатор пользователя;
     @return: `dict` cо списком истории его имён.
     """
