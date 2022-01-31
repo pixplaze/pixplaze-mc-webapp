@@ -14,7 +14,7 @@ class BaseURL:
     def __setattr__(self, key, value):
         if isinstance(value, str):
             object.__setattr__(self, key, self.__dict__['url'] + value)
-        else: raise AttributeError('BaseURL class attributes must be only a str type!')
+        else: raise TypeError('BaseURL class attributes must be only a str type!')
 
 
 class Mojang:
