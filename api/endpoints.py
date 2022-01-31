@@ -24,6 +24,7 @@ class Mojang:
     SESSION_SERVER  = BaseURL('https://sessionserver.mojang.com')
 
     API.SKIN                    = '/user/profile/{uuid}/skin'
+    API.STATISTICS              = '/orders/statistics'
     API.UUID_TO_USERNAME        = '/user/profile/{uuid}'
     API.USERNAME_HISTORY        = '/user/profiles/{uuid}/names'
     API.USERNAMES_TO_UUIDS      = '/profiles/minecraft'

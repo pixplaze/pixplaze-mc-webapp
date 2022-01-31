@@ -119,8 +119,19 @@ def blocked_servers():
     return req.get(Mojang.SESSION_SERVER.BLOCKED_SERVERS).text
 
 
-@warning()
-def statistics(): pass  # TODO
+def statistics(json):
+    """
+    Функция-обёртка для Mojang API.
+    Запрашивает статистику по ключам в списке, к примеру:
+    {`metricKeys`: [
+        'item_sold_minecraft', 'prepaid_card_redeemed_minecraft',
+        'item_sold_cobalt', 'prepaid_card_redeemed_cobalt',
+        'item_sold_dungeons', 'item_sold_scrolls'
+    ]}
+    @param json: `dict` с указынными ключами метрик.
+    @return: `dict` со статистикой.
+    """
+    return req.post(Mojang.API.STATISTICS, json=json).json()
 
 
 @warning()
