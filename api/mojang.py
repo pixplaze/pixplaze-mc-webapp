@@ -221,14 +221,35 @@ def base64_to_json(data):
 
 
 def get_microsoft_auth_url(sess: Session):
-    resp = sess.get(Microsoft.AUTH.REQUEST)
-    html_page = resp.text
-    sFFTag = search(r'value="(.+?)"', html_page).group(1)
-    urlPost = search(r"urlPost:'(.+?)'", html_page).group(1)
+    """
+    Метод авторизации Microsoft.
+    Метод запрашивающий ссылку с уникальным токеном для авторизации
+    на серверах Microsoft.
+    @param sess: сессия `requests.Session`
+    @return:
+        `dict` со ссылкой на страницу авторизации и уникальный токен:
+        `{'sFFTag': <token>, 'urlPost': <url>}`
+    """
+    resp        = sess.get(Microsoft.AUTH.REQUEST)
+    html_page   = resp.text
+    sFFTag      = search(r'value="(.+?)"', html_page).group(1)
+    urlPost     = search(r"urlPost:'(.+?)'", html_page).group(1)
     return {'sFFTag': sFFTag, 'urlPost': urlPost}
 
 
-def get_microsoft_token_url(sess: Session, login_data, auth):  # : Tuple[str, str] = field(default_factory=tuple)
+def get_microsoft_token_url(sess: Session, login_data, auth):
+    """
+    Метод авторизации Microsoft.
+    Метод запрашивающий ссылку содержащую токен авторизации Microsoft.
+    @param sess: сессия `requests.Session`
+    @param login_data:
+        `tuple` данные для входа в Microsoft аккаунт:
+         `(<login>: str, <passwd>: str)`
+    @param auth:
+        `dict` со ссылкой авторизации и токеном:
+        `{'sFFTag': <token>, 'urlPost': <url>}`
+    @return: `set` (<requests.response>, <login_failed>, <two_factor>)
+    """
     resp = sess.post(
         auth['urlPost'],
         params={
@@ -236,18 +257,27 @@ def get_microsoft_token_url(sess: Session, login_data, auth):  # : Tuple[str, st
             'loginfmt': login_data[0],
             'passwd': login_data[1],
             'PPFT': auth['sFFTag']})
-    html_page = resp.text
-    login_failed = True if search(r'Sign in to', html_page) else False
-    two_factor = True if search(r'Help us protect your account', html_page) else False
+    html_page       = resp.text
+    login_failed    = True if search(r'Sign in to', html_page) else False
+    two_factor      = True if search(r'Help us protect your account', html_page) else False
     return resp, {'login_failed': login_failed}, {'two-factor authentication required': two_factor}
 
 
 def parse_microsoft_token(url):
+    """
+    Метод авторизации Microsoft.
+    Разбирает полученный от серверов Microsoft url, в котором
+    содержится токен.
+    @param url:
+        url ответ, получаемый в последнем редиректе авторизации
+        (в методе `get_microsoft_token_url()`).
+    @return: `dict` с данными токена аутентификации.
+    """
     from urllib.parse import unquote
     raw_login_data = url.split('#')[1]
     login_data = dict(item.split('=') for item in raw_login_data.split('&'))
-    login_data['access_token'] = unquote(login_data["access_token"])  # URL decode the access token
-    login_data["refresh_token"] = unquote(login_data["refresh_token"])  # URL decode the refresh token
+    login_data['access_token'] = unquote(login_data["access_token"])
+    login_data["refresh_token"] = unquote(login_data["refresh_token"])
     print(login_data)  # print the data
     return login_data
 
