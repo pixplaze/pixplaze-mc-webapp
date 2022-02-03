@@ -243,11 +243,11 @@ def get_microsoft_token_url(sess: Session, login_data, auth):  # : Tuple[str, st
 
 
 def parse_microsoft_token(url):
-    import requests
+    from urllib.parse import unquote
     raw_login_data = url.split('#')[1]
     login_data = dict(item.split('=') for item in raw_login_data.split('&'))
-    login_data['access_token'] = requests.utils.unquote(login_data["access_token"])  # URL decode the access token
-    login_data["refresh_token"] = requests.utils.unquote(login_data["refresh_token"])  # URL decode the refresh token
+    login_data['access_token'] = unquote(login_data["access_token"])  # URL decode the access token
+    login_data["refresh_token"] = unquote(login_data["refresh_token"])  # URL decode the refresh token
     print(login_data)  # print the data
     return login_data
 
