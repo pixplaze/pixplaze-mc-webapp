@@ -32,3 +32,14 @@ class Mojang:
 
     SESSION_SERVER.BLOCKED_SERVERS = '/blockedservers'
     SESSION_SERVER.PLAYER_PROFILE = '/session/minecraft/profile/{uuid}'
+
+
+class Microsoft:
+    AUTH = BaseURL(
+        'https://login.live.com/oauth20_authorize.srf?client_id' +
+        '=000000004C12AE6F&redirect_uri=https://login.live.com' +
+        '/oauth20_desktop.srf&scope=service::user.auth.xboxlive.com::' +
+        'MBI_SSL&display=touch&response_type=token&locale=en'
+    )
+
+    AUTH.REQUEST = ''

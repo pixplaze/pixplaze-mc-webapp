@@ -5,7 +5,7 @@ import requests as req
 from requests import Session
 from re import search, findall
 
-from .endpoints import Mojang
+from .endpoints import Mojang, Microsoft
 
 # For test only
 
@@ -220,26 +220,29 @@ def base64_to_json(data):
     return json.loads(codecs.decode(data.encode(), 'base64').decode())
 
 
-def request_auth(sess: Session):
-    resp = sess.get(
-        'https://login.live.com/oauth20_authorize.srf?client_id=000000004C12AE6F&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=service::user.auth.xboxlive.com::MBI_SSL&display=touch&response_type=token&locale=en')
+def get_microsoft_auth_url(sess: Session):
+    resp = sess.get(Microsoft.AUTH.REQUEST)
     html_page = resp.text
     sFFTag = search(r'value="(.+?)"', html_page).group(1)
     urlPost = search(r"urlPost:'(.+?)'", html_page).group(1)
     return {'sFFTag': sFFTag, 'urlPost': urlPost}
 
 
-def auth_to_microsoft(sess: Session, login_data, auth):  # : Tuple[str, str] = field(default_factory=tuple)
-    resp = sess.post(auth['urlPost'],
-                     params={'login': login_data[0], 'loginfmt': login_data[0], 'passwd': login_data[1],
-                             'PPFT': auth['sFFTag']})
+def get_microsoft_token_url(sess: Session, login_data, auth):  # : Tuple[str, str] = field(default_factory=tuple)
+    resp = sess.post(
+        auth['urlPost'],
+        params={
+            'login': login_data[0],
+            'loginfmt': login_data[0],
+            'passwd': login_data[1],
+            'PPFT': auth['sFFTag']})
     html_page = resp.text
     login_failed = True if search(r'Sign in to', html_page) else False
     two_factor = True if search(r'Help us protect your account', html_page) else False
     return resp, {'login_failed': login_failed}, {'two-factor authentication required': two_factor}
 
 
-def get_access_token(url):
+def parse_microsoft_token(url):
     import requests
     raw_login_data = url.split('#')[1]
     login_data = dict(item.split('=') for item in raw_login_data.split('&'))
