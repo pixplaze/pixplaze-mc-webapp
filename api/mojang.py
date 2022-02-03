@@ -2,6 +2,9 @@ import json
 import codecs
 from uuid import UUID
 import requests as req
+from requests import Session
+from re import search, findall
+
 from .endpoints import Mojang
 
 # For test only
@@ -15,7 +18,9 @@ def warning(message='Функционал `{name}` пока не поддерж�
     def outer(func):
         def inner(*args, **kwargs):
             raise DeprecationWarning(message.format(name=func.__name__))
+
         return inner
+
     return outer
 
 
@@ -215,6 +220,35 @@ def base64_to_json(data):
     return json.loads(codecs.decode(data.encode(), 'base64').decode())
 
 
+def request_auth(sess: Session):
+    resp = sess.get(
+        'https://login.live.com/oauth20_authorize.srf?client_id=000000004C12AE6F&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=service::user.auth.xboxlive.com::MBI_SSL&display=touch&response_type=token&locale=en')
+    html_page = resp.text
+    sFFTag = search(r'value="(.+?)"', html_page).group(1)
+    urlPost = search(r"urlPost:'(.+?)'", html_page).group(1)
+    return {'sFFTag': sFFTag, 'urlPost': urlPost}
+
+
+def auth_to_microsoft(sess: Session, login_data, auth):  # : Tuple[str, str] = field(default_factory=tuple)
+    resp = sess.post(auth['urlPost'],
+                     params={'login': login_data[0], 'loginfmt': login_data[0], 'passwd': login_data[1],
+                             'PPFT': auth['sFFTag']})
+    html_page = resp.text
+    login_failed = True if search(r'Sign in to', html_page) else False
+    two_factor = True if search(r'Help us protect your account', html_page) else False
+    return resp, {'login_failed': login_failed}, {'two-factor authentication required': two_factor}
+
+
+def get_access_token(url):
+    import requests
+    raw_login_data = url.split('#')[1]
+    login_data = dict(item.split('=') for item in raw_login_data.split('&'))
+    login_data['access_token'] = requests.utils.unquote(login_data["access_token"])  # URL decode the access token
+    login_data["refresh_token"] = requests.utils.unquote(login_data["refresh_token"])  # URL decode the refresh token
+    print(login_data)  # print the data
+    return login_data
+
+
 ####################
 def get_player_textures(uuid):
     profile = uuid_to_user_profile(uuid)
@@ -240,7 +274,9 @@ def bytes_to_image(image_bytes):
 
 
 from PIL import Image
-#image = Image.open('http://textures.minecraft.net/texture/d33ae38e6640b359d40d532f9436b741e3e0abf3f4e7731f7606749f5da38899')
+
+
+# image = Image.open('http://textures.minecraft.net/texture/d33ae38e6640b359d40d532f9436b741e3e0abf3f4e7731f7606749f5da38899')
 
 
 # uuid = 'c01f3d0a58ca4aeaa1b95cf8f172b664'
