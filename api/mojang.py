@@ -248,7 +248,9 @@ def get_microsoft_token_url(sess: Session, login_data, auth):
     @param auth:
         `dict` со ссылкой авторизации и токеном:
         `{'sFFTag': <token>, 'urlPost': <url>}`
-    @return: `set` (<requests.response>, <login_failed>, <two_factor>)
+    @return:
+        `str` URL в котором содержится токен, если авторизация пройдена успешно
+        `dict`, если при авторизации произошли ошибки.
     """
     resp = sess.post(
         auth['urlPost'],
@@ -260,7 +262,15 @@ def get_microsoft_token_url(sess: Session, login_data, auth):
     html_page       = resp.text
     login_failed    = True if search(r'Sign in to', html_page) else False
     two_factor      = True if search(r'Help us protect your account', html_page) else False
-    return resp, {'login_failed': login_failed}, {'two-factor authentication required': two_factor}
+    if login_failed: return {
+        'error': 'AuthenticationFailed',
+        'errorMessage': 'Wrong login or password!'
+    }
+    elif two_factor: return {
+        'error': 'ChildUserAuthentication',
+        'errorMessage': 'A child user should be added to XboxLive family!'
+    }
+    return resp.url
 
 
 def parse_microsoft_token(url):
